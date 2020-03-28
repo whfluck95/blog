@@ -92,5 +92,52 @@ def users(request, username=None):
         return JsonResponse(result)
 
     elif request.method == 'PUT':
+        #更新 http://127.0.0.1:8000/v1/users/username
+        if not username:
+            result = {'code':10108,'error':'Must be give me username'}
+            return JsonResponse(result)
 
-        pass
+        json_str = request.body
+        #TODO 空Body判断
+        json_obj = json.loads(json_str)
+        nickname = json_obj.get('nickname')
+        sign = json_obj.get('sign')
+        info = json_obj.get('info')
+
+        user = request.user
+
+        #当前请求,token用户修改自己的数据
+        if user.username != username:
+            result = {'code':10109,'error':'The username is error!'}
+            return JsonResponse(result)
+
+        to_update = False
+        if user.nickname != nickname:
+            to_update = True
+        if user.info != info:
+            to_update = True
+        if user.sign != sign:
+            to_update = True
+
+        if to_update:
+            #做更新
+            user.sign = sign
+            user.nickname = nickname
+            user.info = info
+            user.save()
+        return JsonResponse({'code': 200, 'username': username})
+
+def users_avatar(request,username):
+    #处理头像上传
+    #考虑七牛云处理（后续）
+    if request.method != 'POST':
+        result = {'code':10110,'error':'Please use POST'}
+        return JsonResponse(result)
+    user = request.user
+    if user.username != username:
+        result = {'code':10111,'error':'The username is error'}
+        return JsonResponse(result)
+
+    user.avatar = request.FILES['avatar']
+    user.save()
+    return JsonResponse({'code':200,'username':username})
