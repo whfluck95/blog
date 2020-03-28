@@ -6,11 +6,45 @@ from django.shortcuts import render
 from .models import UserProfile
 from wtoken.views import make_token
 # Create your views here.
-def users(request):
+def users(request, username=None):
 
     if request.method == 'GET':
-        #拿取数据
-        pass
+        if username:
+            users = UserProfile.objects.filter(username=username)
+            user = users[0]
+            #TODO 没用户 返回提示
+            #拿具体用户数据
+            #有查询字符串[?nickname=1] or 没查询字符串
+            if request.GET.keys():
+                #查询字符串
+                data = {}
+                for k in request.GET.keys():
+                    if hasattr(user, k):
+                        #过滤字段
+                        if k == 'password':
+                            continue
+                        v = getattr(user, k)
+                        data[k] = v
+                result = {'code':200, 'username':username, 'data':data}
+
+            else:
+                #无查询字符串
+                result = {'code':200, 'username':username,'data':{'nickname':user.nickname,'sign':user.sign,'info':user.info,'avatar':str(user.avatar)}}
+
+            return JsonResponse(result)
+        else:
+            # 拿数据
+            all_users = UserProfile.objects.all()
+            users_data = []
+            for user in all_users:
+                dic = {}
+                dic['nickname'] = user.nickname
+                dic['username'] = user.username
+                dic['sign'] = user.sign
+                dic['info'] = user.info
+                users_data.append(dic)
+            result = {'code': 200, 'data': users_data}
+            return JsonResponse(result)
     elif request.method == 'POST':
         #创建用户
         json_str = request.body
@@ -53,9 +87,10 @@ def users(request):
             return JsonResponse(result)
 
         #生成token
-        token = make_taken(username,3600*24)
+        token = make_token(username,3600*24)
         result = {'code':200,'data':{'token':token.decode()},'username':username}
         return JsonResponse(result)
 
-    elif:
+    elif request.method == 'PUT':
+
         pass
