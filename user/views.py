@@ -5,7 +5,9 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from .models import UserProfile
 from wtoken.views import make_token
+from tools.logging_check import logging_check
 # Create your views here.
+@logging_check('PUT')
 def users(request, username=None):
 
     if request.method == 'GET':
@@ -81,8 +83,7 @@ def users(request, username=None):
                 email=email
             )
         except Exception as e:
-            print('-----create error-----')
-            print(e)
+
             result= {'code':10105,'error':'The username is already existed !!'}
             return JsonResponse(result)
 
@@ -126,7 +127,7 @@ def users(request, username=None):
             user.info = info
             user.save()
         return JsonResponse({'code': 200, 'username': username})
-
+@logging_check('POST')
 def users_avatar(request,username):
     #处理头像上传
     #考虑七牛云处理（后续）
