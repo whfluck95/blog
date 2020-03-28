@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'user',
     'wtoken',
+    'topic',
 ]
 
 MIDDLEWARE = [
@@ -150,3 +151,12 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-with',
 )
+
+#   v1/abc/    地址栏中  v1/abc  301 -> v1/abc/
+APPEND_SLASH = False
+
+# 用户上传的 文件或者音视频，图片， media
+#文件存储目录
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#浏览器 访问文件的地址 http://127.0.0.1:8000/media/....
+MEDIA_URL = '/media/'

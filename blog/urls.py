@@ -13,9 +13,12 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.conf.urls import url, include
+from django.conf.urls.static import static
 from django.contrib import admin
 from . import views
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -23,5 +26,11 @@ urlpatterns = [
     #http://127.0.0.1:8000/v1/users
     url(r'^v1/users',include('user.urls')),
     #http://127.0.0.1:8000/v1/tokens
-    url(r'^v1/token',include('wtoken.urls'))
+    url(r'^v1/token',include('wtoken.urls')),
+    #http://127.0.0.1:8000/v1/topics
+    url(r'^v1/topics',include('topic.urls'))
 ]
+
+#绑定 media_url 和 media_root, 显性操作
+# 127.0.0.1:8000/media/ -> MEDIA_ROOT
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
